@@ -1,0 +1,21 @@
+version: '3.4'
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    image: elestio/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: email@email.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+      PGADMIN_LISTEN_PORT: 54321
+    ports:
+      - 54321:54321
+    depends_on:
+      - postgres
