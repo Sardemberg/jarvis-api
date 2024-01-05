@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"jarvisapi/models"
 	"log"
 	"os"
 
@@ -15,8 +16,6 @@ var (
 )
 
 func InitializeDB() {
-	fmt.Println(os.Getenv("DATABASE_HOST"))
-
 	connStr := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Fortaleza",
 		os.Getenv("DATABASE_HOST"),
@@ -32,6 +31,8 @@ func InitializeDB() {
 		log.Fatalf("Error to connect database. Error: %s", err.Error())
 		os.Exit(-1)
 	}
+
+	DB.AutoMigrate(&models.Notification{})
 
 	fmt.Println("Succefuly connection to database")
 }
