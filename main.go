@@ -1,8 +1,9 @@
 package main
 
 import (
-	"jarvisapi/database"
 	"jarvisapi/routes"
+	"jarvisapi/services"
+	"jarvisapi/workers"
 	"log"
 	"os"
 
@@ -12,13 +13,16 @@ import (
 
 func init() {
 	LoadEnvs()
-	database.InitializeDB()
+	// database.InitializeDB()
+	// workers.InitializeScheduler()
+	log.Fatal(services.SendNewMessage("Olá, essa mensagem é de teste"))
 }
 
 func main() {
 	handler := gin.Default()
 	routes.HandleRoutes(handler)
 	handler.Run()
+	workers.StopScheduler()
 }
 
 func LoadEnvs() {

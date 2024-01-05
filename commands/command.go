@@ -1,5 +1,6 @@
 package commands
 
 type Command interface {
-	Execute() (string, error)
+	Execute(params ...string) (string, error)
+	GetDescription() string
 }

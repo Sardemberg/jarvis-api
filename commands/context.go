@@ -4,6 +4,6 @@ type Context struct {
 	Command Command
 }
 
-func (c *Context) ExecuteCommand() (string, error) {
-	return c.Command.Execute()
+func (c *Context) ExecuteCommand(params ...string) (string, error) {
+	return c.Command.Execute(params...)
 }

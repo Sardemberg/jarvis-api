@@ -10,11 +10,11 @@ import (
 func HomeController(c *gin.Context) {
 	hello := commands.HelloCommand{}
 	context := commands.Context{Command: &hello}
-	result, err := context.ExecuteCommand()
+	result, err := context.ExecuteCommand("--test=1")
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 	}
 
