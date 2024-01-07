@@ -4,13 +4,18 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 func TransformParams(params ...string) (map[string]string, error) {
 	mapperParams := make(map[string]string)
 
+	fmt.Println(params)
+
 	for _, param := range params {
-		re := regexp.MustCompile(`--([^=]+)=(.+)`)
+		param = strings.TrimSpace(param)
+
+		re := regexp.MustCompile(`^([^=]+)=(.*)$`)
 
 		matches := re.FindStringSubmatch(param)
 

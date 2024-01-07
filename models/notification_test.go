@@ -12,7 +12,7 @@ func TestNotificationValidation(t *testing.T) {
 	notification := models.Notification{}
 	assert.Equal(t, isNotValid(&notification), true)
 
-	notification.Frequency = true
+	notification.Every = true
 	assert.Equal(t, isNotValid(&notification), true)
 
 	notification.StartedAt = time.Now()
@@ -21,8 +21,8 @@ func TestNotificationValidation(t *testing.T) {
 	notification.FinishedAt = time.Now()
 	assert.Equal(t, isNotValid(&notification), true)
 
-	notification.Metadata = make(map[string]interface{})
-	notification.Metadata["teste"] = true
+	notification.Metadata = make(map[string]string)
+	notification.Metadata["teste"] = "true"
 
 	assert.Equal(t, isNotValid(&notification), true)
 
