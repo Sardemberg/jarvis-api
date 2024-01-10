@@ -15,6 +15,7 @@ func init() {
 	LoadEnvs()
 	database.InitializeDB()
 	workers.InitializeScheduler()
+	workers.Scheduler.Start()
 }
 
 func main() {

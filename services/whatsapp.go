@@ -18,13 +18,13 @@ func newRequest(requestMethod, path string, body map[string]interface{}) (*http.
 	return http.NewRequest(requestMethod, path, bytes.NewReader(bodyJson))
 }
 
-func SendNewMessage(content string) error {
+func SendNewMessage(content, number string) error {
 	path := os.Getenv("WHATSAPP_SERVICE_URL") + os.Getenv("WHATSAPP_ID") + "/messages"
 
 	bodyRequest := map[string]interface{}{
 		"messaging_product": "whatsapp",
 		"recipient_type":    "individual",
-		"to":                os.Getenv("PHONE_NUMBER"),
+		"to":                number,
 		"type":              "text",
 		"text": map[string]interface{}{
 			"preview_url": false,
@@ -46,10 +46,10 @@ func SendNewMessage(content string) error {
 	response, err := client.Do(req)
 
 	if err != nil {
-		return err
+		fmt.Println(response, err)
 	}
 
-	fmt.Println(response)
+	fmt.Println("Opa")
 
 	return nil
 }

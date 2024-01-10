@@ -1,11 +1,14 @@
 package commands
 
 import (
+	"fmt"
 	"jarvisapi/database"
 	"jarvisapi/models"
 	"jarvisapi/services"
 	"jarvisapi/workers"
 	"strconv"
+
+	"github.com/go-co-op/gocron/v2"
 )
 
 type NotificationCommand struct{}
@@ -23,10 +26,16 @@ func (n *NotificationCommand) Execute(params ...string) (string, error) {
 		return "", err
 	}
 
+	cronString := getCronString(mapParams)
+
+	mapParams["cronString"] = cronString
+
 	notification := models.Notification{
-		Status:   models.Pending,
-		Every:    every,
-		Metadata: mapParams,
+		Status:  models.Pending,
+		Every:   every,
+		Cron:    cronString,
+		Message: mapParams["message"],
+		Number:  mapParams["number"],
 	}
 
 	result := database.DB.Create(&notification)
@@ -35,9 +44,42 @@ func (n *NotificationCommand) Execute(params ...string) (string, error) {
 		return "", result.Error
 	}
 
-	cronString := getCronString(mapParams)
+	job, err := workers.Scheduler.NewJob(
+		gocron.CronJob(cronString, false),
+		gocron.NewTask(func(notificationId int) {
+			var notification models.Notification
 
-	workers.Cron.AddFunc(cronString, func() {})
+			database.DB.First(&notification, notificationId)
+
+			err := services.SendNewMessage(
+				notification.Message,
+				notification.Number,
+			)
+
+			if err != nil {
+				notification.Status = models.Failed
+			}
+
+			notification.Status = models.Processed
+
+			database.DB.UpdateColumn("status", &notification)
+		}, int(notification.ID)),
+	)
+
+	if err != nil {
+		return "", err
+	}
+
+	notification.JobId = job.ID()
+
+	result = database.DB.UpdateColumns(notification)
+
+	if result.Error != nil {
+		workers.Scheduler.RemoveJob(job.ID())
+		return "", result.Error
+	}
+
+	fmt.Println(job.ID())
 
 	return "Notificação criada com sucesso", nil
 }
@@ -49,9 +91,13 @@ func getCronString(params map[string]string) string {
 
 	for _, key := range cronKeys {
 		if params[key] != "" {
-			cronString = cronString + params[key]
+			if params["every"] != "false" {
+				cronString = cronString + "*/" + params[key] + " "
+			} else {
+				cronString = cronString + params[key] + " "
+			}
 		} else {
-			cronString = cronString + "*"
+			cronString = cronString + "* "
 		}
 	}
 
@@ -60,16 +106,4 @@ func getCronString(params map[string]string) string {
 
 func (n *NotificationCommand) GetDescription() string {
 	return "Notification command add new scheduler to your bot"
-}
-
-func executeJob(id int) {
-	var notification models.Notification
-
-	database.DB.First(&notification, id)
-
-	if !notification.Every && notification.Status == models.Processed {
-		return
-	}
-
-	services.SendNewMessage(notification.Metadata["message"])
 }

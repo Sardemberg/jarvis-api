@@ -10,8 +10,6 @@ import (
 func TransformParams(params ...string) (map[string]string, error) {
 	mapperParams := make(map[string]string)
 
-	fmt.Println(params)
-
 	for _, param := range params {
 		param = strings.TrimSpace(param)
 

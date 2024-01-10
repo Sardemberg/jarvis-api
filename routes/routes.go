@@ -7,5 +7,6 @@ import (
 )
 
 func HandleRoutes(e *gin.Engine) {
+	e.POST("/", controllers.CommandsController)
 	e.GET("/", controllers.HomeController)
 }

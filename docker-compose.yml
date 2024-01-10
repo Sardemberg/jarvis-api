@@ -19,3 +19,10 @@ services:
       - 54321:54321
     depends_on:
       - postgres
+
+  jarvis:
+    image: jarvis
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres

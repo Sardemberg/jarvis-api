@@ -21,13 +21,16 @@ func TestNotificationValidation(t *testing.T) {
 	notification.FinishedAt = time.Now()
 	assert.Equal(t, isNotValid(&notification), true)
 
-	notification.Metadata = make(map[string]string)
-	notification.Metadata["teste"] = "true"
-
+	notification.Number = "8898123122"
 	assert.Equal(t, isNotValid(&notification), true)
 
 	notification.Status = models.Processed
+	assert.Equal(t, isNotValid(&notification), true)
 
+	notification.Message = "Blá, blá, blá"
+	assert.Equal(t, isNotValid(&notification), true)
+
+	notification.Cron = "* * * * *"
 	assert.Equal(t, isNotValid(&notification), false)
 }
 

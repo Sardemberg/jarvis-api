@@ -2,19 +2,25 @@ package workers
 
 import (
 	"fmt"
+	"log"
 
-	"github.com/robfig/cron"
+	"github.com/go-co-op/gocron/v2"
 )
 
-var Cron *cron.Cron
+var (
+	Scheduler gocron.Scheduler
+	err       error
+)
 
 func InitializeScheduler() {
-	Cron = cron.New()
-	fmt.Println("Initializing scheduler")
-	Cron.Start()
+	Scheduler, err = gocron.NewScheduler()
+
+	if err != nil {
+		log.Fatalf("Erro ao inicializar scheduler, erro: %s", err.Error())
+	}
 }
 
 func StopScheduler() {
 	fmt.Println("Stopping scheduler")
-	Cron.Stop()
+	Scheduler.Shutdown()
 }
